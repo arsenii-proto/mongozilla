@@ -47,7 +47,7 @@ describe("parseMixinAction", () => {
 
     expect(manager.statically.getters.has(getterName)).toBe(true);
 
-    const result = manager.statically.getters.apply(getterName, {}, []);
+    const result = manager.statically.getters.apply(getterName, {}, [])();
 
     expect(result).toBeInstanceOf(Promise);
   });
@@ -76,7 +76,7 @@ describe("parseMixinAction", () => {
     parseMixinAction({ mixin, manager });
 
     manager.statically.getters
-      .apply(getterName, args.target, [args.name, args.age])
+      .apply(getterName, args.target, [])(args.name, args.age)
       .then(result => {
         expect(args.name).toBe(called.name);
         expect(args.age).toBe(called.age);

@@ -23,42 +23,20 @@ const checkMixin = mixin => {
 };
 
 /** @type {MongoZilla.MixinParser.ParserMethod} */
-const parseMixinAction = ({ mixin, manager }) => {
+const parseMixinMethods = ({ mixin, manager }) => {
   checkMixin(mixin);
   checkManager(manager);
 
-  Object.keys(mixin.actions || {}).forEach(key => {
-    const callable = mixin.actions[key];
+  Object.keys(mixin.methods || {}).forEach(key => {
+    const callable = mixin.methods[key];
 
     if (!(callable instanceof Function || typeof callable === "function"))
       return;
 
-    manager.statically.getters.set(key, function() {
-      return (...args) => {
-        const started = new Date();
-        const target = this;
-
-        return Promise.resolve()
-          .then(() => callable.apply(target, args))
-          .catch(error => {
-            const ended = new Date();
-            throw {
-              error,
-              started,
-              ended
-            };
-          })
-          .then(result => {
-            const ended = new Date();
-            return {
-              result,
-              started,
-              ended
-            };
-          });
-      };
+    manager.proto.getters.set(key, function() {
+      return (...args) => callable.apply(this, args);
     });
   });
 };
 
-export { parseMixinAction };
+export { parseMixinMethods };
