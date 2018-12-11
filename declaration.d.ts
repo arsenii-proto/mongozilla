@@ -48,3 +48,23 @@ declare module MongoZilla.LifeCycleHooks {
     ): boolean;
   }
 }
+
+declare module MongoZilla.PropsOveloadingManager {
+  interface Manager {
+    proto: {
+      setters: ManagerNamespaceFacade;
+      getters: ManagerNamespaceFacade;
+    };
+    statically: {
+      setters: ManagerNamespaceFacade;
+      getters: ManagerNamespaceFacade;
+    };
+  }
+
+  interface ManagerNamespaceFacade {
+    has: (name: String) => boolean;
+    set: (name: String, callable: Function) => void;
+    delete: (name: String) => boolean;
+    apply: (name: String, target: Object, args?: Array<any>) => any;
+  }
+}

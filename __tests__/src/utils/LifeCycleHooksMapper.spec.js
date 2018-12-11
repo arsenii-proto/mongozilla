@@ -20,39 +20,39 @@ describe("createHooksMapper", () => {
 
 describe("returned mapper from createHooksMapper", () => {
   describe("on method", () => {
-    it("should pass with correct params", () => {
+    it("should pass with correct args", () => {
       const mapper = createHooksMapper();
 
       expect(mapper.on("construct", function(args) {}, MIXIN));
       expect(mapper.on("saving", function(args) {}, SYSTEM));
     });
-    it("should throw error called without params", () => {
+    it("should throw error called without args", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on()).toThrowError();
     });
-    it("should throw error called with first param only", () => {
+    it("should throw error called with first arg only", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on("saving")).toThrowError();
     });
-    it("should throw error when pass not string as first param", () => {
+    it("should throw error when pass not string as first arg", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on(11, function(args) {})).toThrowError();
       expect(() => mapper.on({}, function(args) {})).toThrowError();
       expect(() => mapper.on(true, function(args) {})).toThrowError();
     });
-    it("should throw error when pass not allowed string as first param", () => {
+    it("should throw error when pass not allowed string as first arg", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on("11", function(args) {})).toThrowError();
       expect(() => mapper.on("{}", function(args) {})).toThrowError();
       expect(() => mapper.on("true", function(args) {})).toThrowError();
     });
-    it("should throw error when pass not function as second param", () => {
+    it("should throw error when pass not function as second arg", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on("construct", 11)).toThrowError();
       expect(() => mapper.on("construct", {})).toThrowError();
       expect(() => mapper.on("construct", true)).toThrowError();
     });
-    it("should throw error when pass not allowed third param", () => {
+    it("should throw error when pass not allowed third arg", () => {
       const mapper = createHooksMapper();
       expect(() => mapper.on("construct", function() {}, 11111)).toThrowError();
       expect(() => mapper.on("construct", function() {}, {})).toThrowError();
@@ -60,38 +60,38 @@ describe("returned mapper from createHooksMapper", () => {
     });
   });
   describe("fire method", () => {
-    it("should pass with correct params", () => {
+    it("should pass with correct args", () => {
       const mapper = createHooksMapper();
 
       expect(mapper.fire("saving", {}, [], []));
       expect(mapper.fire("saving", {}, []));
       expect(mapper.fire("saving", {}));
     });
-    it("should throw error called without params", () => {
+    it("should throw error called without args", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fire()).toThrowError();
     });
-    it("should throw error called with first param only", () => {
+    it("should throw error called with first arg only", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fire("saving")).toThrowError();
     });
-    it("should throw error called with not string first param", () => {
+    it("should throw error called with not string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fire(11, {})).toThrowError();
       expect(() => mapper.fire({}, {})).toThrowError();
       expect(() => mapper.fire(true, {})).toThrowError();
     });
-    it("should throw error called with not allowed string first param", () => {
+    it("should throw error called with not allowed string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fire("11", {})).toThrowError();
       expect(() => mapper.fire("{}", {})).toThrowError();
       expect(() => mapper.fire("true", {})).toThrowError();
     });
-    it("should throw error called with not object second param", () => {
+    it("should throw error called with not object second arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fire("saving", 11)).toThrowError();
@@ -146,7 +146,7 @@ describe("returned mapper from createHooksMapper", () => {
     });
   });
   describe("fireChain method", () => {
-    it("should pass with correct params", () => {
+    it("should pass with correct args", () => {
       const mapper = createHooksMapper();
 
       expect(mapper.fireChain("saving", {}, [], []));
@@ -158,31 +158,31 @@ describe("returned mapper from createHooksMapper", () => {
 
       expect(typeof mapper.fireChain("saving", {})).toBe("boolean");
     });
-    it("should throw error called without params", () => {
+    it("should throw error called without args", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChain()).toThrowError();
     });
-    it("should throw error called with first param only", () => {
+    it("should throw error called with first arg only", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChain("saving")).toThrowError();
     });
-    it("should throw error called with not string first param", () => {
+    it("should throw error called with not string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChain(11, {})).toThrowError();
       expect(() => mapper.fireChain({}, {})).toThrowError();
       expect(() => mapper.fireChain(true, {})).toThrowError();
     });
-    it("should throw error called with not allowed string first param", () => {
+    it("should throw error called with not allowed string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChain("11", {})).toThrowError();
       expect(() => mapper.fireChain("{}", {})).toThrowError();
       expect(() => mapper.fireChain("true", {})).toThrowError();
     });
-    it("should throw error called with not object second param", () => {
+    it("should throw error called with not object second arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChain("saving", 11)).toThrowError();
@@ -191,7 +191,7 @@ describe("returned mapper from createHooksMapper", () => {
     });
   });
   describe("on -> fireChain intergation", () => {
-    describe("check order and params", () => {
+    describe("check order and args", () => {
       const mapper = createHooksMapper();
 
       const calledOrder = [];
@@ -317,7 +317,7 @@ describe("returned mapper from createHooksMapper", () => {
     });
   });
   describe("fireChainReverse method", () => {
-    it("should pass with correct params", () => {
+    it("should pass with correct args", () => {
       const mapper = createHooksMapper();
 
       expect(mapper.fireChainReverse("saving", {}, [], []));
@@ -329,31 +329,31 @@ describe("returned mapper from createHooksMapper", () => {
 
       expect(typeof mapper.fireChainReverse("saving", {})).toBe("boolean");
     });
-    it("should throw error called without params", () => {
+    it("should throw error called without args", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChainReverse()).toThrowError();
     });
-    it("should throw error called with first param only", () => {
+    it("should throw error called with first arg only", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChainReverse("saving")).toThrowError();
     });
-    it("should throw error called with not string first param", () => {
+    it("should throw error called with not string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChainReverse(11, {})).toThrowError();
       expect(() => mapper.fireChainReverse({}, {})).toThrowError();
       expect(() => mapper.fireChainReverse(true, {})).toThrowError();
     });
-    it("should throw error called with not allowed string first param", () => {
+    it("should throw error called with not allowed string first arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChainReverse("11", {})).toThrowError();
       expect(() => mapper.fireChainReverse("{}", {})).toThrowError();
       expect(() => mapper.fireChainReverse("true", {})).toThrowError();
     });
-    it("should throw error called with not object second param", () => {
+    it("should throw error called with not object second arg", () => {
       const mapper = createHooksMapper();
 
       expect(() => mapper.fireChainReverse("saving", 11)).toThrowError();
@@ -362,7 +362,7 @@ describe("returned mapper from createHooksMapper", () => {
     });
   });
   describe("on -> fireChainReverse intergation", () => {
-    describe("check order and params", () => {
+    describe("check order and args", () => {
       const mapper = createHooksMapper();
 
       const calledOrder = [];

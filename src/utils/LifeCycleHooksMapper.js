@@ -77,8 +77,8 @@ function createHooksMapper() {
       throw new Error("Type are not allowed");
     }
 
-    if (typeof callable !== "function") {
-      throw new Error("Callable need to be an function");
+    if (!(callable instanceof Function || typeof callable === "function")) {
+      throw new Error("Callable must be an Function");
     }
 
     if (!(hook in map)) {
