@@ -28,12 +28,17 @@ const parseMixinAction = ({ mixin, manager }) => {
   checkManager(manager);
 
   Object.keys(mixin.actions || {}).forEach(key => {
+    const callable = mixin.actions[key];
+
+    if (!(callable instanceof Function || typeof callable === "function"))
+      return;
+
     manager.statically.getters.set(key, function(...args) {
       const started = new Date();
       const target = this;
 
       return Promise.resolve()
-        .then(() => mixin.actions[key].apply(target, args))
+        .then(() => callable.apply(target, args))
         .catch(error => {
           const ended = new Date();
           throw {

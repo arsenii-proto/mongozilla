@@ -30,8 +30,6 @@ describe("parseMixinAction", () => {
       }
     };
 
-    console.log("HERE");
-
     parseMixinAction({ mixin, manager });
 
     expect(manager.statically.getters.has(getterName)).toBe(true);
