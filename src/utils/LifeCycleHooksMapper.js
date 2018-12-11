@@ -17,7 +17,7 @@ const availableHhooks = [
   "refreshed"
 ];
 
-const checkFireParams = (hook, target, args = [], systemArgs = []) => {
+const checkFireParams = (hook, target, args = [], systemArg = {}) => {
   if (!availableHhooks.includes(hook)) {
     throw new Error("Hook are not available");
   }
@@ -30,8 +30,8 @@ const checkFireParams = (hook, target, args = [], systemArgs = []) => {
     throw new Error("Args must be an array");
   }
 
-  if (!(systemArgs instanceof Array)) {
-    throw new Error("SystemArgs must be an array");
+  if (!(systemArg instanceof Object)) {
+    throw new Error("SystemArg must be an object");
   }
 };
 
@@ -39,9 +39,9 @@ const performFireInOrder = (map, order) => (
   hook,
   target,
   args = [],
-  systemArgs = []
+  systemArg = {}
 ) => {
-  checkFireParams(hook, target, args, systemArgs);
+  checkFireParams(hook, target, args, systemArg);
 
   if (hook in map) {
     let all = true;
@@ -49,7 +49,7 @@ const performFireInOrder = (map, order) => (
     order.forEach(type => {
       if (all && type in map[hook]) {
         all = map[hook][type].reduce((all, callable) => {
-          const argsToPass = type === SYSTEM ? [args, systemArgs] : args;
+          const argsToPass = type === SYSTEM ? [args, systemArg] : args;
           const result = all && callable.apply(target, argsToPass);
 
           return result === undefined || Boolean(result);
@@ -93,8 +93,8 @@ function createHooksMapper() {
   };
 
   /** @type {MongoZilla.LifeCycleHooks.FireHook} */
-  const fire = (hook, target, args = [], systemArgs = []) => {
-    checkFireParams(hook, target, args, systemArgs);
+  const fire = (hook, target, args = [], systemArg = {}) => {
+    checkFireParams(hook, target, args, systemArg);
 
     if (hook in map) {
       if (MODEL in map[hook]) {
@@ -105,7 +105,7 @@ function createHooksMapper() {
       }
       if (SYSTEM in map[hook]) {
         map[hook][SYSTEM].forEach(callable =>
-          callable.apply(target, [args, systemArgs])
+          callable.apply(target, [args, systemArg])
         );
       }
     }
