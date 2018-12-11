@@ -76,3 +76,20 @@ declare module MongoZilla.PropsOveloadingManager {
     apply: (name: String, target: Object, args?: Array<any>) => any;
   }
 }
+
+declare module MongoZilla.MixinParser {
+  interface ParserMethod {
+    (arg: MixinParserArg): void;
+  }
+
+  interface MixinParserArg {
+    mixin: MongoZilla.Mixin.MixinSchema;
+    manager: MongoZilla.PropsOveloadingManager.Manager;
+  }
+}
+
+declare module MongoZilla.Mixin {
+  interface MixinSchema {
+    actions?: object;
+  }
+}
