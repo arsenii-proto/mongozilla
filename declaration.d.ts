@@ -90,6 +90,45 @@ declare module MongoZilla.MixinParser {
 
 declare module MongoZilla.Mixin {
   interface MixinSchema {
+    /** Connection Name */
+    connection?: string;
+    /** Collection Name */
+    colection: string;
+    /** Model Blueprint */
+    blueprint: object;
+    /** Model intance methods */
+    methods?: object;
+    /** Database Actions */
     actions?: object;
+    /** Computed props */
+    computed?: object;
+    /** Contruct lifecycle */
+    construct?: Function;
+    /** Validating lifecycle */
+    validating?: Function;
+    /** Validated lifecycle */
+    validated?: Function;
+    /** Model props Validator */
+    validator?: Function;
+    /** Saving lifecycle */
+    saving?: Function;
+    /** Saved lifecycle */
+    saved?: Function;
+    /** Retrieved lifecycle */
+    retrieved?: Function;
+    /** Creating lifecycle */
+    creating?: Function;
+    /** Created lifecycle */
+    created?: Function;
+    /** Updating lifecycle */
+    updating?: Function;
+    /** Updated lifecycle */
+    updated?: Function;
+    /** Deleting lifecycle */
+    deleting?: Function;
+    /** Deleted lifecycle */
+    deleted?: Function;
+    /** Refreshed lifecycle */
+    refreshed?: Function;
   }
 }
