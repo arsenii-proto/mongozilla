@@ -47,6 +47,25 @@ const unset = namespace => name => {
   checkName(name);
   return delete namespace[name];
 };
+const checkManager = manager => {
+  ["has", "set", "delete", "apply"].forEach(key => {
+    ["setters", "getters"].forEach(type => {
+      ["proto", "statically"].forEach(namespace => {
+        if (
+          !(namespace in manager) &&
+          !(type in manager[namespace]) &&
+          !(key in manager[namespace][type])
+        ) {
+          throw new Error(
+            "Manager must have shape of {MongoZilla.PropsOveloadingManager.Manager}"
+          );
+        }
+      });
+    });
+  });
+};
+
+/** @type {MongoZilla.PropsOveloadingManager.Constructor} */
 const createOverloadingManager = () => {
   const proto = {
     setters: {},
@@ -92,4 +111,122 @@ const createOverloadingManager = () => {
   return manager;
 };
 
-export { createOverloadingManager };
+/** @type {MongoZilla.PropsOveloadingManager.ExtendedContructed} */
+const createExtendedOverloadingManager = source => {
+  checkManager(source);
+
+  const proto = {
+    setters: {},
+    getters: {}
+  };
+  const statically = {
+    setters: {},
+    getters: {}
+  };
+
+  /** @type {MongoZilla.PropsOveloadingManager.Manager} */
+  const manager = {
+    proto: {
+      setters: {
+        has(name) {
+          if (has(proto.setters)(name)) {
+            return true;
+          }
+          return source.proto.setters.has(name);
+        },
+        set: set(proto.setters),
+        delete(name) {
+          if (has(proto.setters)(name)) {
+            unset(proto.setters)(name);
+          }
+          return source.proto.setters.delete(name);
+        },
+        apply(name, target, args = [], systemArgs = []) {
+          if (has(proto.setters)(name)) {
+            return apply(proto.setters)(name, target, args, systemArgs);
+          }
+          return source.proto.setters.apply(name, target, args, systemArgs);
+        }
+      },
+      getters: {
+        has(name) {
+          if (has(proto.getters)(name)) {
+            return true;
+          }
+          return source.proto.getters.has(name);
+        },
+        set: set(proto.getters),
+        delete(name) {
+          if (has(proto.getters)(name)) {
+            unset(proto.getters)(name);
+          }
+          return source.proto.getters.delete(name);
+        },
+        apply(name, target, args = [], systemArgs = []) {
+          if (has(proto.getters)(name)) {
+            return apply(proto.getters)(name, target, args, systemArgs);
+          }
+          return source.proto.getters.apply(name, target, args, systemArgs);
+        }
+      }
+    },
+    statically: {
+      setters: {
+        has(name) {
+          if (has(statically.setters)(name)) {
+            return true;
+          }
+          return source.statically.setters.has(name);
+        },
+        set: set(statically.setters),
+        delete(name) {
+          if (has(statically.setters)(name)) {
+            unset(statically.setters)(name);
+          }
+          return source.statically.setters.delete(name);
+        },
+        apply(name, target, args = [], systemArgs = []) {
+          if (has(statically.setters)(name)) {
+            return apply(statically.setters)(name, target, args, systemArgs);
+          }
+          return source.statically.setters.apply(
+            name,
+            target,
+            args,
+            systemArgs
+          );
+        }
+      },
+      getters: {
+        has(name) {
+          if (has(statically.getters)(name)) {
+            return true;
+          }
+          return source.statically.getters.has(name);
+        },
+        set: set(statically.getters),
+        delete(name) {
+          if (has(statically.getters)(name)) {
+            unset(statically.getters)(name);
+          }
+          return source.statically.getters.delete(name);
+        },
+        apply(name, target, args = [], systemArgs = []) {
+          if (has(statically.getters)(name)) {
+            return apply(statically.getters)(name, target, args, systemArgs);
+          }
+          return source.statically.getters.apply(
+            name,
+            target,
+            args,
+            systemArgs
+          );
+        }
+      }
+    }
+  };
+
+  return manager;
+};
+
+export { createOverloadingManager, createExtendedOverloadingManager };

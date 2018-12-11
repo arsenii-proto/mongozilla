@@ -50,6 +50,14 @@ declare module MongoZilla.LifeCycleHooks {
 }
 
 declare module MongoZilla.PropsOveloadingManager {
+  interface Constructor {
+    (): Manager;
+  }
+
+  interface ExtendedContructed {
+    (source: Manager): Manager;
+  }
+
   interface Manager {
     proto: {
       setters: ManagerNamespaceFacade;
