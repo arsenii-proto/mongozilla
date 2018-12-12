@@ -15,6 +15,9 @@ describe("createHooksMapper", () => {
     expect(mapper).toBeInstanceOf(Object);
     expect(mapper.on).toBeDefined();
     expect(mapper.fire).toBeDefined();
+    expect(mapper.fireReverse).toBeDefined();
+    expect(mapper.fireChain).toBeDefined();
+    expect(mapper.fireChainReverse).toBeDefined();
   });
 });
 
@@ -127,6 +130,92 @@ describe("returned mapper from createHooksMapper", () => {
     mapper.on(hook, systemListenerSpy, SYSTEM);
 
     mapper.fire(hook, target, args, systemArgs);
+
+    it("should fire hook in aspected order", () => {
+      expect(calledOrder).toEqual([1, 2, 3]);
+    });
+
+    it("should fire hook with target as this ", () => {
+      expect(calledThis).toEqual([target, target, target]);
+    });
+
+    it("should fire mixin and model hook with args", () => {
+      expect(mixinListenerSpy.mock.calls[0]).toEqual(args);
+      expect(modelListenerSpy.mock.calls[0]).toEqual(args);
+    });
+
+    it("should fire system hook with systemArgs", () => {
+      expect(systemListenerSpy.mock.calls[0]).toEqual([args, systemArgs]);
+    });
+  });
+  describe("fireReverse method", () => {
+    it("should pass with correct args", () => {
+      const mapper = createHooksMapper();
+
+      expect(mapper.fireReverse("saving", {}, [], []));
+      expect(mapper.fireReverse("saving", {}, []));
+      expect(mapper.fireReverse("saving", {}));
+    });
+    it("should throw error called without args", () => {
+      const mapper = createHooksMapper();
+
+      expect(() => mapper.fireReverse()).toThrowError();
+    });
+    it("should throw error called with first arg only", () => {
+      const mapper = createHooksMapper();
+
+      expect(() => mapper.fireReverse("saving")).toThrowError();
+    });
+    it("should throw error called with not string first arg", () => {
+      const mapper = createHooksMapper();
+
+      expect(() => mapper.fireReverse(11, {})).toThrowError();
+      expect(() => mapper.fireReverse({}, {})).toThrowError();
+      expect(() => mapper.fireReverse(true, {})).toThrowError();
+    });
+    it("should throw error called with not allowed string first arg", () => {
+      const mapper = createHooksMapper();
+
+      expect(() => mapper.fireReverse("11", {})).toThrowError();
+      expect(() => mapper.fireReverse("{}", {})).toThrowError();
+      expect(() => mapper.fireReverse("true", {})).toThrowError();
+    });
+    it("should throw error called with not object second arg", () => {
+      const mapper = createHooksMapper();
+
+      expect(() => mapper.fireReverse("saving", 11)).toThrowError();
+      expect(() => mapper.fireReverse("saving", "")).toThrowError();
+      expect(() => mapper.fireReverse("saving", true)).toThrowError();
+    });
+  });
+  describe("on -> fireReverse intergation", () => {
+    const mapper = createHooksMapper();
+
+    const calledOrder = [];
+    const calledThis = [];
+    const args = [1, 2];
+    const systemArgs = [3, 4];
+    const target = {};
+    const hook = "construct";
+
+    const mixinListenerSpy = jest.fn(function() {
+      calledOrder.push(3);
+      calledThis.push(this);
+    });
+    const modelListenerSpy = jest.fn(function() {
+      calledOrder.push(2);
+      calledThis.push(this);
+    });
+    const systemListenerSpy = jest.fn(function() {
+      calledOrder.push(1);
+      calledThis.push(this);
+    });
+
+    mapper.on(hook, mixinListenerSpy);
+    mapper.on(hook, modelListenerSpy, MODEL);
+    mapper.on(hook, systemListenerSpy, SYSTEM);
+
+    mapper.fireReverse(hook, target, args, systemArgs);
 
     it("should fire hook in aspected order", () => {
       expect(calledOrder).toEqual([1, 2, 3]);

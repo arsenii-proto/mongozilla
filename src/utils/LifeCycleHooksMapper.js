@@ -1,6 +1,6 @@
 import { MIXIN, MODEL, SYSTEM } from "@/src/conts/MixinTypes";
 
-const availableHhooks = [
+const availableHooks = [
   "construct",
   "validating",
   "validated",
@@ -18,7 +18,7 @@ const availableHhooks = [
 ];
 
 const checkFireParams = (hook, target, args = [], systemArg = {}) => {
-  if (!availableHhooks.includes(hook)) {
+  if (!availableHooks.includes(hook)) {
     throw new Error("Hook are not available");
   }
 
@@ -36,6 +36,24 @@ const checkFireParams = (hook, target, args = [], systemArg = {}) => {
 };
 
 const performFireInOrder = (map, order) => (
+  hook,
+  target,
+  args = [],
+  systemArg = {}
+) => {
+  checkFireParams(hook, target, args, systemArg);
+
+  if (hook in map) {
+    order.forEach(type => {
+      if (type in map[hook]) {
+        const argsToPass = type === SYSTEM ? [args, systemArg] : args;
+        map[hook][type].forEach(callable => callable.apply(target, argsToPass));
+      }
+    });
+  }
+};
+
+const performFireChainInOrder = (map, order) => (
   hook,
   target,
   args = [],
@@ -69,7 +87,7 @@ function createHooksMapper() {
 
   /** @type {MongoZilla.LifeCycleHooks.AddListener} */
   const on = (hook, callable, type = MIXIN) => {
-    if (!availableHhooks.includes(hook)) {
+    if (!availableHooks.includes(hook)) {
       throw new Error("Hook are not available");
     }
 
@@ -93,34 +111,21 @@ function createHooksMapper() {
   };
 
   /** @type {MongoZilla.LifeCycleHooks.FireHook} */
-  const fire = (hook, target, args = [], systemArg = {}) => {
-    checkFireParams(hook, target, args, systemArg);
+  const fire = performFireInOrder(map, [MODEL, MIXIN, SYSTEM]);
 
-    if (hook in map) {
-      if (MODEL in map[hook]) {
-        map[hook][MODEL].forEach(callable => callable.apply(target, args));
-      }
-      if (MIXIN in map[hook]) {
-        map[hook][MIXIN].forEach(callable => callable.apply(target, args));
-      }
-      if (SYSTEM in map[hook]) {
-        map[hook][SYSTEM].forEach(callable =>
-          callable.apply(target, [args, systemArg])
-        );
-      }
-    }
-  };
+  /** @type {MongoZilla.LifeCycleHooks.FireHook} */
+  const fireReverse = performFireInOrder(map, [SYSTEM, MODEL, MIXIN]);
 
   /** @type {MongoZilla.LifeCycleHooks.FireHookChain} */
-  const fireChain = performFireInOrder(map, [MODEL, MIXIN, SYSTEM]);
+  const fireChain = performFireChainInOrder(map, [MODEL, MIXIN, SYSTEM]);
 
   /** @type {MongoZilla.LifeCycleHooks.FireHookChain} */
-  const fireChainReverse = performFireInOrder(map, [SYSTEM, MODEL, MIXIN]);
+  const fireChainReverse = performFireChainInOrder(map, [SYSTEM, MODEL, MIXIN]);
 
   /** @type {MongoZilla.LifeCycleHooks.Mapper} */
-  const mapper = { on, fire, fireChain, fireChainReverse };
+  const mapper = { on, fire, fireReverse, fireChain, fireChainReverse };
 
   return mapper;
 }
 
-export { createHooksMapper, MIXIN, SYSTEM, MODEL };
+export { createHooksMapper, MIXIN, SYSTEM, MODEL, availableHooks };

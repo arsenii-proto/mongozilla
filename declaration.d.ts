@@ -6,6 +6,7 @@ declare module MongoZilla.LifeCycleHooks {
   interface Mapper {
     on: AddListener;
     fire: FireHook;
+    fireReverse: FireHook;
     fireChain: FireHookChain;
     fireChainReverse: FireHookChain;
   }
@@ -85,6 +86,7 @@ declare module MongoZilla.MixinParser {
   interface MixinParserArg {
     mixin: MongoZilla.Mixin.MixinSchema;
     manager: MongoZilla.PropsOveloadingManager.Manager;
+    mapper: MongoZilla.LifeCycleHooks.Mapper;
   }
 }
 
