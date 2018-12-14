@@ -134,3 +134,15 @@ declare module MongoZilla.Mixin {
     refreshed?: Function;
   }
 }
+
+declare module MongoZilla.BlueprintValidator {
+  interface Constructor {
+    (blueprint: object): Validator;
+  }
+
+  interface Validator {
+    valid: (value: any) => Boolean;
+    map: (value: any) => any;
+    required: Boolean;
+  }
+}

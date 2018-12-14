@@ -2,7 +2,9 @@
   "extends": ["plugin:prettier/recommended"],
   "root": true,
   "env": {
-    "node": true
+    "node": true,
+    "es6": true,
+    "browser": true
   },
   "rules": {
     "no-console": "off",
@@ -10,6 +12,11 @@
   },
   "parserOptions": {
     "parser": "babel-eslint",
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "spread": true,
+      "experimentalObjectRestSpread": true
+    }
   }
 }
