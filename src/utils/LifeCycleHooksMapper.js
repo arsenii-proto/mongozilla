@@ -18,7 +18,7 @@ const availableHooks = [
 ];
 
 const checkFireParams = (hook, target, args = [], systemArg = {}) => {
-  if (!availableHooks.includes(hook)) {
+  if (![...availableHooks, "retrieving"].includes(hook)) {
     throw new Error("Hook are not available");
   }
 
@@ -87,7 +87,7 @@ function createHooksMapper() {
 
   /** @type {MongoZilla.LifeCycleHooks.AddListener} */
   const on = (hook, callable, type = MIXIN) => {
-    if (!availableHooks.includes(hook)) {
+    if (![...availableHooks, "retrieving"].includes(hook)) {
       throw new Error("Hook are not available");
     }
 

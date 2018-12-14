@@ -1,3 +1,54 @@
+declare module MongoZilla.Model {
+  interface Schema {
+    /** Connection Name */
+    connection?: string;
+    /** Collection Name */
+    colection: string;
+    /** Model Blueprint */
+    blueprint: object;
+    /** Model intance methods */
+    methods?: object;
+    /** Database Actions */
+    actions?: object;
+    /** Computed props */
+    computed?: object;
+    /** Contruct lifecycle */
+    construct?: Function;
+    /** Validating lifecycle */
+    validating?: Function;
+    /** Validated lifecycle */
+    validated?: Function;
+    /** Model props Validator */
+    validator?: Function;
+    /** Saving lifecycle */
+    saving?: Function;
+    /** Saved lifecycle */
+    saved?: Function;
+    /** Retrieved lifecycle */
+    retrieved?: Function;
+    /** Creating lifecycle */
+    creating?: Function;
+    /** Created lifecycle */
+    created?: Function;
+    /** Updating lifecycle */
+    updating?: Function;
+    /** Updated lifecycle */
+    updated?: Function;
+    /** Deleting lifecycle */
+    deleting?: Function;
+    /** Deleted lifecycle */
+    deleted?: Function;
+    /** Refreshed lifecycle */
+    refreshed?: Function;
+  }
+
+  interface Factory {}
+
+  interface FactoryBuilder {
+    (schema: Schema): Factory;
+  }
+}
+
 declare module MongoZilla.LifeCycleHooks {
   interface Construct {
     (): Mapper;
@@ -19,7 +70,6 @@ declare module MongoZilla.LifeCycleHooks {
     | "construct"
     | "validating"
     | "validated"
-    | "validator"
     | "saving"
     | "saved"
     | "retrieved"
@@ -144,5 +194,17 @@ declare module MongoZilla.BlueprintValidator {
     valid: (value: any) => Boolean;
     map: (value: any) => any;
     required: Boolean;
+  }
+}
+
+declare module MongoZilla.ModelHandler {
+  interface Constructor {
+    (operator: ModelOperator): Object;
+  }
+
+  interface ModelOperator {
+    manager: MongoZilla.PropsOveloadingManager.Manager;
+    mapper: MongoZilla.LifeCycleHooks.Mapper;
+    validator: MongoZilla.BlueprintValidator.Validator;
   }
 }
