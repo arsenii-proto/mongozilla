@@ -60,10 +60,9 @@ const performFireChainInOrder = (map, order) => (
   systemArg = {}
 ) => {
   checkFireParams(hook, target, args, systemArg);
+  let all = true;
 
   if (hook in map) {
-    let all = true;
-
     order.forEach(type => {
       if (all && type in map[hook]) {
         all = map[hook][type].reduce((all, callable) => {
@@ -74,11 +73,9 @@ const performFireChainInOrder = (map, order) => (
         }, all);
       }
     });
-
-    return all;
   }
 
-  return false;
+  return all;
 };
 
 /** @type {MongoZilla.LifeCycleHooks.Mapper} */

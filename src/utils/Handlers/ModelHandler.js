@@ -1,240 +1,131 @@
+import { createExtendedOverloadingManager } from "@/src/utils/PropsOverloadingManager";
 /** @type {MongoZilla.ModelHandler.Constructor} */
-const createModelFactoryHandler = operator => ({
-  apply() {
-    throw new Error("Model Factory need can be used just like constructor");
-  },
-  construct(Model, args) {
-    const model = new Model();
-    const modelProxy = new Proxy(model, createModelHandler(operator));
+const createModelHandler = operator => {
+  const manager = createExtendedOverloadingManager(operator.manager);
 
-    model.originals = {};
-    model.attributes = args.length ? args[0] : {};
+  return {
+    defineProperty(Model, key, descriptor) {
+      if (!Reflect.isExtensible(Model)) return false;
 
-    if (
-      !operator.mapper.fireChainReverse("construct", modelProxy, args, operator)
-    ) {
-      return null;
-    }
+      if (manager.proto.getters.has(key)) {
+        if (manager.proto.setters.has(key)) {
+          if (descriptor.configurable) {
+            manager.proto.setters.apply(key, Model.proxy, descriptor.value);
+          } else {
+            manager.proto.setters.delete(key);
+            manager.proto.getters.delete(key);
+            manager.proto.getters.set(key, () => descriptor.value);
+          }
+        } else {
+          return false;
+        }
+      } else {
+        if (manager.proto.setters.has(key)) {
+          return false;
+        }
 
-    if (!operator.validator.valid(modelProxy.json)) {
-      return null;
-    }
+        let { value } = descriptor;
+        manager.proto.getters.set(key, () => value);
 
-    if (
-      !operator.mapper.fireChainReverse("validating", modelProxy, [], operator)
-    ) {
-      return null;
-    }
-
-    if (
-      !operator.mapper.fireChainReverse("validated", modelProxy, [], operator)
-    ) {
-      return null;
-    }
-
-    return modelProxy;
-  },
-  defineProperty(Model, key, descriptor) {
-    if (!Reflect.isExtensible(Model)) return false;
-
-    if (key in hooks.staticSetters) {
-      return hooks.staticSetters[key](descriptor.value);
-    }
-
-    if (key in hooks.staticGetters) return false;
-
-    if (key in hooks.staticProps) {
-      const prop = hooks.staticProps[key];
-
-      if (prop.configurable) {
-        hooks.staticProps[key] = descriptor;
-        return true;
+        if (descriptor.configurable) {
+          manager.proto.setters.set(key, v => (value = v));
+        }
       }
 
+      return true;
+    },
+    deleteProperty(Model, key) {
+      if (!Reflect.isExtensible(Model)) return false;
+
+      if (manager.proto.getters.has(key) && !manager.proto.setters.has(key)) {
+        return false;
+      }
+
+      if (!manager.proto.getters.has(key) && manager.proto.setters.has(key)) {
+        return false;
+      }
+
+      if (manager.proto.getters.has(key)) {
+        manager.proto.getters.delete(key);
+      }
+
+      if (manager.proto.setters.has(key)) {
+        manager.proto.setters.delete(key);
+      }
+
+      return true;
+    },
+    get(Model, key) {
+      if (key in Model) {
+        return Model[key];
+      }
+
+      if (manager.proto.getters.has(String(key))) {
+        return manager.proto.getters.apply(String(key), Model.proxy);
+      }
+
+      return undefined;
+    },
+    getOwnPropertyDescriptor(Model, key) {
+      const descriptor = {
+        configurable: true,
+        writable: true,
+        value: undefined
+      };
+
+      if (manager.proto.getters.has(key)) {
+        descriptor.value = manager.proto.getters.apply(key, Model.proxy);
+      }
+
+      return descriptor;
+    },
+    has(Model, key) {
+      return manager.proto.getters.has(key) || manager.proto.setters.has(key);
+    },
+    isExtensible(Model) {
+      return Reflect.isExtensible(Model);
+    },
+    ownKeys() {
+      const keys = manager.proto.getters.list();
+
+      manager.proto.setters.list().forEach(key => {
+        if (!keys.includes(key)) {
+          keys.push(key);
+        }
+      });
+
+      return keys;
+    },
+    preventExtensions(Model) {
+      Object.preventExtensions(Model);
+      return true;
+    },
+    set(Model, key, value) {
+      if (!Reflect.isExtensible(Model)) return value;
+
+      if (manager.proto.getters.has(key)) {
+        if (manager.proto.setters.has(key)) {
+          manager.proto.setters.apply(key, Model.proxy, value);
+        } else {
+          return value;
+        }
+      } else {
+        if (manager.proto.setters.has(key)) {
+          return value;
+        }
+
+        let valueCopy = value;
+
+        manager.proto.getters.set(key, () => value);
+        manager.proto.setters.set(key, v => (value = v));
+      }
+
+      return value;
+    },
+    setPrototypeOf() {
       return false;
     }
+  };
+};
 
-    hooks.staticProps[key] = descriptor;
-
-    return true;
-  },
-  deleteProperty(Model, key) {
-    if (key in hooks.staticProps) {
-      const prop = hooks.staticProps[key];
-
-      if (prop.configurable) {
-        delete hooks.staticProps[key];
-        return true;
-      }
-    }
-    return false;
-  },
-  get(Model, key) {
-    if (key in hooks.staticGetters) {
-      return hooks.staticGetters[key];
-    }
-
-    if (key in hooks.staticProps) {
-      return hooks.staticProps[key];
-    }
-
-    return undefined;
-  },
-  getOwnPropertyDescriptor(Model, key) {
-    if (key in hooks.staticGetters) {
-      return {
-        configurable: true,
-        enumerable: true,
-        value: hooks.staticGetters[key]
-      };
-    }
-
-    if (key in hooks.staticProps) {
-      return { ...hooks.staticProps[key] };
-    }
-
-    return { configurable: true, enumerable: true, value: undefined };
-  },
-  getPrototypeOf(Model) {
-    return Model;
-  },
-  has(Model, key) {
-    return key in hooks.staticGetters || key in hooks.staticProps;
-  },
-  isExtensible(Model) {
-    return Reflect.isExtensible(Model);
-  },
-  ownKeys() {
-    return [
-      ...Object.keys(hooks.staticProps),
-      ...Object.keys(hooks.staticGetters)
-    ];
-  },
-  preventExtensions(Model) {
-    Object.preventExtensions(Model);
-    return true;
-  },
-  set(Model, key, value) {
-    if (!Reflect.isExtensible(Model)) return value;
-
-    if (key in hooks.staticSetters) {
-      return hooks.staticSetters[key](value);
-    }
-
-    if (key in hooks.staticGetters) return false;
-
-    if (key in hooks.staticProps) {
-      const prop = hooks.staticProps[key];
-
-      if (prop.configurable) {
-        return (hooks.staticProps[key].value = value);
-      }
-    }
-
-    return value;
-  },
-  setPrototypeOf() {
-    return false;
-  }
-});
-
-const createModelHandler = operator => ({
-  defineProperty(Model, key, descriptor) {
-    if (!Reflect.isExtensible(Model)) return false;
-
-    if (key in hooks.setters) {
-      return hooks.setters[key](descriptor.value);
-    }
-
-    if (key in hooks.getters) return false;
-
-    if (key in hooks.props) {
-      const prop = hooks.props[key];
-
-      if (prop.configurable) {
-        hooks.props[key] = descriptor;
-        return true;
-      }
-
-      return false;
-    }
-
-    hooks.props[key] = descriptor;
-
-    return true;
-  },
-  deleteProperty(Model, key) {
-    if (key in hooks.props) {
-      const prop = hooks.props[key];
-
-      if (prop.configurable) {
-        delete hooks.props[key];
-        return true;
-      }
-    }
-    return false;
-  },
-  get(Model, key) {
-    if (key in hooks.getters) {
-      return hooks.getters[key];
-    }
-
-    if (key in hooks.props) {
-      return hooks.props[key];
-    }
-
-    return undefined;
-  },
-  getOwnPropertyDescriptor(Model, key) {
-    if (key in hooks.getters) {
-      return {
-        configurable: true,
-        enumerable: true,
-        value: hooks.getters[key]
-      };
-    }
-
-    if (key in hooks.props) {
-      return { ...hooks.props[key] };
-    }
-
-    return { configurable: true, enumerable: true, value: undefined };
-  },
-  getPrototypeOf(Model) {
-    return Model;
-  },
-  has(Model, key) {
-    return key in hooks.getters || key in hooks.props;
-  },
-  isExtensible(Model) {
-    return Reflect.isExtensible(Model);
-  },
-  ownKeys() {
-    return [...Object.keys(hooks.props), ...Object.keys(hooks.getters)];
-  },
-  preventExtensions(Model) {
-    Object.preventExtensions(Model);
-    return true;
-  },
-  set(Model, key, value) {
-    if (!Reflect.isExtensible(Model)) return value;
-
-    if (key in hooks.setters) {
-      return hooks.setters[key](value);
-    }
-
-    if (key in hooks.getters) return false;
-
-    if (key in hooks.props) {
-      const prop = hooks.props[key];
-
-      if (prop.configurable) {
-        return (hooks.props[key].value = value);
-      }
-    }
-
-    return value;
-  }
-});
-
-export { createModelFactoryHandler };
+export { createModelHandler };

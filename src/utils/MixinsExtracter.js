@@ -1,15 +1,13 @@
-const extractMixins = {mixins, ...schema} => {
-    let mixinsList = [schema]
+const extractMixins = ({ mixins, ...schema }) => {
+  let mixinsList = [schema];
 
-    if(mixins) {
-        mixins.forEach(mixin => {
-            mixinsList = [...mixinsList, ...extractMixins(mixin)]
-        });
-    }
+  if (mixins) {
+    mixins.forEach(mixin => {
+      mixinsList = [...mixinsList, ...extractMixins(mixin)];
+    });
+  }
 
-    return mixinsList;
-} 
+  return mixinsList;
+};
 
-export {
-    extractMixins
-}
+export { extractMixins };

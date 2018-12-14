@@ -47,6 +47,9 @@ const unset = namespace => name => {
   checkName(name);
   return delete namespace[name];
 };
+const list = namespace => () => {
+  return Object.keys(namespace);
+};
 const checkManager = manager => {
   ["has", "set", "delete", "apply"].forEach(key => {
     ["setters", "getters"].forEach(type => {
@@ -83,13 +86,15 @@ const createOverloadingManager = () => {
         has: has(proto.setters),
         set: set(proto.setters),
         delete: unset(proto.setters),
-        apply: apply(proto.setters)
+        apply: apply(proto.setters),
+        list: list(proto.setters)
       },
       getters: {
         has: has(proto.getters),
         set: set(proto.getters),
         delete: unset(proto.getters),
-        apply: apply(proto.getters)
+        apply: apply(proto.getters),
+        list: list(proto.getters)
       }
     },
     statically: {
@@ -97,13 +102,15 @@ const createOverloadingManager = () => {
         has: has(statically.setters),
         set: set(statically.setters),
         delete: unset(statically.setters),
-        apply: apply(statically.setters)
+        apply: apply(statically.setters),
+        list: list(statically.setters)
       },
       getters: {
         has: has(statically.getters),
         set: set(statically.getters),
         delete: unset(statically.getters),
-        apply: apply(statically.getters)
+        apply: apply(statically.getters),
+        list: list(statically.getters)
       }
     }
   };
@@ -146,6 +153,18 @@ const createExtendedOverloadingManager = source => {
             return apply(proto.setters)(name, target, args, systemArgs);
           }
           return source.proto.setters.apply(name, target, args, systemArgs);
+        },
+        list() {
+          const ownKeys = list(proto.setters)();
+          const sourceKeys = source.proto.setters.list();
+
+          sourceKeys.forEach(key => {
+            if (!ownKeys.includes(key)) {
+              ownKeys.push(key);
+            }
+          });
+
+          return ownKeys;
         }
       },
       getters: {
@@ -167,6 +186,18 @@ const createExtendedOverloadingManager = source => {
             return apply(proto.getters)(name, target, args, systemArgs);
           }
           return source.proto.getters.apply(name, target, args, systemArgs);
+        },
+        list() {
+          const ownKeys = list(proto.getters)();
+          const sourceKeys = source.proto.getters.list();
+
+          sourceKeys.forEach(key => {
+            if (!ownKeys.includes(key)) {
+              ownKeys.push(key);
+            }
+          });
+
+          return ownKeys;
         }
       }
     },
@@ -195,6 +226,18 @@ const createExtendedOverloadingManager = source => {
             args,
             systemArgs
           );
+        },
+        list() {
+          const ownKeys = list(statically.setters)();
+          const sourceKeys = source.statically.setters.list();
+
+          sourceKeys.forEach(key => {
+            if (!ownKeys.includes(key)) {
+              ownKeys.push(key);
+            }
+          });
+
+          return ownKeys;
         }
       },
       getters: {
@@ -221,6 +264,18 @@ const createExtendedOverloadingManager = source => {
             args,
             systemArgs
           );
+        },
+        list() {
+          const ownKeys = list(statically.getters)();
+          const sourceKeys = source.statically.getters.list();
+
+          sourceKeys.forEach(key => {
+            if (!ownKeys.includes(key)) {
+              ownKeys.push(key);
+            }
+          });
+
+          return ownKeys;
         }
       }
     }

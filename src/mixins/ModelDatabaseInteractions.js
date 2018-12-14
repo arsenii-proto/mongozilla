@@ -3,13 +3,10 @@ const saveModel = (model, options, operator) => {};
 
 export default {
   _$type: SYSTEM,
-  computed: {
-    save: {
-      get(_, operator) {
-        return (options = {}) => {
-          saveModel(this, options, operator);
-        };
-      }
+  methods: {
+    save(options = {}) {
+      saveModel(this, options, operator);
     }
-  }
+  },
+  construct() {}
 };

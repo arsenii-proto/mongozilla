@@ -3,7 +3,8 @@ import { createOverloadingManager } from "@/src/utils/PropsOverloadingManager";
 import { makeBlueprintValidator } from "./utils/BlueprintValidator";
 import ModelDatabaseInteractions from "@/src/mixins/ModelDatabaseInteractions";
 import { extractMixins } from "@/src/utils/MixinsExtracter";
-import { createModelFactoryHandler } from "@/src/utils/Handlers/ModelHandler";
+import { createModelFactoryHandler } from "@/src/utils/Handlers/FactoryHandler";
+import { parseMixin } from "@/src/utils/SchemaParser/Parse";
 
 const modelMixins = [ModelDatabaseInteractions];
 
@@ -22,11 +23,16 @@ const Model = ({ blueprint, colection, connection, ...rest }) => {
     manager,
     validator,
     mixins,
-    retrieve
+    retrieve,
+    Factory
   };
   const handler = createModelFactoryHandler(operator);
 
   mixins.forEach(mixin => parseMixin({ ...operator, mixin }));
 
-  return new Proxy(Factory, handler);
+  Factory.proxy = new Proxy(Factory, handler);
+
+  return Factory.proxy;
 };
+
+export { Model };

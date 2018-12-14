@@ -42,7 +42,7 @@ declare module MongoZilla.Model {
     refreshed?: Function;
   }
 
-  interface Factory {}
+  interface Factory { }
 
   interface FactoryBuilder {
     (schema: Schema): Factory;
@@ -125,6 +125,7 @@ declare module MongoZilla.PropsOveloadingManager {
     set: (name: String, callable: Function) => void;
     delete: (name: String) => boolean;
     apply: (name: String, target: Object, args?: Array<any>) => any;
+    list: () => Array<String>
   }
 }
 
