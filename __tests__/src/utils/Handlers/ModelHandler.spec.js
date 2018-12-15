@@ -3,6 +3,8 @@ import { createHooksMapper } from "@/src/utils/LifeCycleHooksMapper";
 import { createOverloadingManager } from "@/src/utils/PropsOverloadingManager";
 
 describe("createModelHandler", () => {
+  const instance = {};
+
   it("should be exported", () => {
     expect(createModelHandler).toBeDefined();
   });
@@ -10,7 +12,7 @@ describe("createModelHandler", () => {
   it("should return proxy handler", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
 
     expect(handler.defineProperty).toBeDefined();
     expect(handler.deleteProperty).toBeDefined();
@@ -26,7 +28,7 @@ describe("createModelHandler", () => {
   it("should return value on get after defineProperty", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propName = "name";
     const descriptor = {
@@ -43,7 +45,7 @@ describe("createModelHandler", () => {
   it("should return value on get after set", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propName = "name";
     const value = 123;
@@ -57,7 +59,7 @@ describe("createModelHandler", () => {
   it("should return true on delete after set", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propName = "name";
     const value = 123;
@@ -71,7 +73,7 @@ describe("createModelHandler", () => {
   it("should return configurable from descriptor return from getOwnPropertyDescriptor after set", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propName = "name";
     const value = 123;
@@ -87,7 +89,7 @@ describe("createModelHandler", () => {
   it("should return true on has after set", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propName = "name";
     const value = 123;
@@ -102,7 +104,7 @@ describe("createModelHandler", () => {
   it("should return true on isExtensible ", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
 
     const result = handler.isExtensible(target);
@@ -113,7 +115,7 @@ describe("createModelHandler", () => {
   it("should return keys on ownKeys after set", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
     const propNames = ["name", "age"];
     const values = ["Andrei", 123];
@@ -131,7 +133,7 @@ describe("createModelHandler", () => {
   it("should return false on isExtensible after preventExtensions", () => {
     const mapper = createHooksMapper();
     const manager = createOverloadingManager();
-    const handler = createModelHandler({ mapper, manager });
+    const handler = createModelHandler({ mapper, manager, instance });
     const target = { proxy: {} };
 
     handler.preventExtensions(target);

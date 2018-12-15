@@ -19,7 +19,9 @@ describe("makeBlueprintValidator", () => {
 
   it("should resolve correctly {name: Any}", () => {
     const blueprint = {
-      name: Any
+      name: {
+        $type: Any
+      }
     };
     const validator = makeBlueprintValidator(blueprint);
 

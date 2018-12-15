@@ -3,7 +3,7 @@ declare module MongoZilla.Model {
     /** Connection Name */
     connection?: string;
     /** Collection Name */
-    colection: string;
+    collection: string;
     /** Model Blueprint */
     blueprint: object;
     /** Model intance methods */
@@ -12,14 +12,10 @@ declare module MongoZilla.Model {
     actions?: object;
     /** Computed props */
     computed?: object;
-    /** Contruct lifecycle */
-    construct?: Function;
     /** Validating lifecycle */
     validating?: Function;
     /** Validated lifecycle */
     validated?: Function;
-    /** Model props Validator */
-    validator?: Function;
     /** Saving lifecycle */
     saving?: Function;
     /** Saved lifecycle */
@@ -67,7 +63,6 @@ declare module MongoZilla.LifeCycleHooks {
   }
 
   type AvailableHooks =
-    | "construct"
     | "validating"
     | "validated"
     | "saving"
@@ -146,7 +141,7 @@ declare module MongoZilla.Mixin {
     /** Connection Name */
     connection?: string;
     /** Collection Name */
-    colection: string;
+    collection: string;
     /** Model Blueprint */
     blueprint: object;
     /** Model intance methods */
@@ -155,14 +150,10 @@ declare module MongoZilla.Mixin {
     actions?: object;
     /** Computed props */
     computed?: object;
-    /** Contruct lifecycle */
-    construct?: Function;
     /** Validating lifecycle */
     validating?: Function;
     /** Validated lifecycle */
     validated?: Function;
-    /** Model props Validator */
-    validator?: Function;
     /** Saving lifecycle */
     saving?: Function;
     /** Saved lifecycle */

@@ -1,12 +1,24 @@
 {
-  "presets": ["env"],
+  "presets": [
+    "es2015",
+    "stage-0"
+  ],
   "plugins": [
     [
       "module-resolver",
       {
         "alias": {
-          "@": ["./"]
+          "@": [
+            "./"
+          ]
         }
+      }
+    ],
+    [
+      "transform-runtime",
+      {
+        "polyfill": false,
+        "regenerator": true
       }
     ]
   ]

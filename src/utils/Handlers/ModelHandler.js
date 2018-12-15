@@ -1,8 +1,5 @@
-import { createExtendedOverloadingManager } from "@/src/utils/PropsOverloadingManager";
 /** @type {MongoZilla.ModelHandler.Constructor} */
-const createModelHandler = operator => {
-  const manager = createExtendedOverloadingManager(operator.manager);
-
+const createModelHandler = ({ manager }) => {
   return {
     defineProperty(Model, key, descriptor) {
       if (!Reflect.isExtensible(Model)) return false;
@@ -105,7 +102,7 @@ const createModelHandler = operator => {
 
       if (manager.proto.getters.has(key)) {
         if (manager.proto.setters.has(key)) {
-          manager.proto.setters.apply(key, Model.proxy, value);
+          manager.proto.setters.apply(key, Model.proxy, [value]);
         } else {
           return value;
         }

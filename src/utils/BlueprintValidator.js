@@ -94,7 +94,9 @@ const makeValueValidator = shape => {
       validator.required(shape.$required);
     }
 
-    validator.addValidator(value => isType(shape.$type, value));
+    if (shape.$type !== Any) {
+      validator.addValidator(value => isType(shape.$type, value));
+    }
 
     if (Number === shape.$type) {
       if ("$min" in shape) {

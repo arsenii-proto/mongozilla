@@ -1,6 +1,6 @@
 # connection?: string;
 
-# colection: string;
+# collection: string;
 
 # blueprint: object;
 
@@ -10,13 +10,9 @@
 
 # ~~computed?: object;~~
 
-# construct?: Function;
-
 # validating?: Function;
 
 # validated?: Function;
-
-# validator?: Function;
 
 # saving?: Function;
 

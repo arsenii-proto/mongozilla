@@ -1,10 +1,8 @@
 import { MIXIN, MODEL, SYSTEM } from "@/src/conts/MixinTypes";
 
 const availableHooks = [
-  "construct",
   "validating",
   "validated",
-  "validator",
   "saving",
   "saved",
   "retrieved",

@@ -1,3 +1,5 @@
+import { MIXIN } from "@/src/conts/MixinTypes";
+
 const checkName = name => {
   if (!(name instanceof String || typeof name === "string")) {
     throw new Error("Name must be an String");

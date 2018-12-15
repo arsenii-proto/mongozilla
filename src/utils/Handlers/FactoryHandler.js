@@ -1,4 +1,6 @@
 import { createModelHandler } from "@/src/utils/Handlers/ModelHandler";
+import { createExtendedOverloadingManager } from "@/src/utils/PropsOverloadingManager";
+import { SYSTEM } from "../SchemaParser/Parse";
 
 /** @type {MongoZilla.ModelHandler.Constructor} */
 const createModelFactoryHandler = operator => {
@@ -9,46 +11,60 @@ const createModelFactoryHandler = operator => {
       throw new Error("Model Factory need can be used just like constructor");
     },
     construct(Model, args) {
-      const model = new Model();
-      const modelProxy = new Proxy(model, createModelHandler(operator));
+      const instance = new Model();
+      const instanceManager = createExtendedOverloadingManager(
+        operator.manager
+      );
+      const instanceOperator = {
+        manager: instanceManager,
+        mapper: operator.mapper,
+        validator: operator.validator,
+        mixin: operator.mixin,
+        mixins: operator.mixins,
+        retrieve: operator.retrieve,
+        Factory: operator.Factory,
+        blueprint: operator.blueprint,
+        collection: operator.collection,
+        connection: operator.connection
+      };
+      const instanceProxy = new Proxy(
+        instance,
+        createModelHandler(instanceOperator)
+      );
 
-      model.proxy = modelProxy;
-      model.originals = {};
-      model.attributes = args.length ? args[0] : {};
+      instanceOperator.proxy = instance.proxy = instanceProxy;
+      instanceManager.proto.getters.set(SYSTEM, () => instanceOperator);
 
       if (
         !operator.mapper.fireChainReverse(
-          "construct",
-          modelProxy,
+          "creating",
+          instanceProxy,
           args,
-          operator
+          instance
         )
       ) {
-        return null;
+        return 1;
       }
 
-      if (!operator.validator.valid(modelProxy.json)) {
-        return null;
+      if (!operator.validator.valid(instanceProxy.json)) {
+        return 2;
       }
 
       if (
         !operator.mapper.fireChainReverse(
           "validating",
-          modelProxy,
+          instanceProxy,
           [],
-          operator
+          instance
         )
       ) {
-        return null;
+        return 3;
       }
 
-      if (
-        !operator.mapper.fireChainReverse("validated", modelProxy, [], operator)
-      ) {
-        return null;
-      }
+      operator.mapper.fire("validated", instanceProxy);
+      operator.mapper.fire("created", instanceProxy);
 
-      return modelProxy;
+      return instanceProxy;
     },
     defineProperty(Model, key, descriptor) {
       if (!Reflect.isExtensible(Model)) return false;

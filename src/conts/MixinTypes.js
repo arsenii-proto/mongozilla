@@ -1,8 +1,17 @@
-const SYSTEM =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiU1lTVEVNIn0.BEwvT0pTlnGSI_0O11w1yOAOgLT9nbfIgIIaslEPMQ8";
-const MIXIN =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiTUlYSU4ifQ.4-2aA2rUesApq5s2pyVx6dr-Ebx1RQK1So9i4z6VNWk";
-const MODEL =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiTU9ERUwifQ.m2zEKaQ_HfINcUZJD6r8BpusSl-l5TK30itb8BhpRNE";
+const SYSTEM = "SYSTEM-ss-s-s-s-sss".replace(/s/g, () =>
+  Date.now()
+    .toString(16)
+    .substring(1)
+);
+const MIXIN = "MIXIN-ss-s-s-s-sss".replace(/s/g, () =>
+  Date.now()
+    .toString(16)
+    .substring(1)
+);
+const MODEL = "MODEL-ss-s-s-s-sss".replace(/s/g, () =>
+  Date.now()
+    .toString(16)
+    .substring(1)
+);
 
 export { SYSTEM, MODEL, MIXIN };

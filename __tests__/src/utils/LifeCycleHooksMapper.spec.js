@@ -26,7 +26,7 @@ describe("returned mapper from createHooksMapper", () => {
     it("should pass with correct args", () => {
       const mapper = createHooksMapper();
 
-      expect(mapper.on("construct", function(args) {}, MIXIN));
+      expect(mapper.on("creating", function(args) {}, MIXIN));
       expect(mapper.on("saving", function(args) {}, SYSTEM));
     });
     it("should throw error called without args", () => {
@@ -51,15 +51,15 @@ describe("returned mapper from createHooksMapper", () => {
     });
     it("should throw error when pass not function as second arg", () => {
       const mapper = createHooksMapper();
-      expect(() => mapper.on("construct", 11)).toThrowError();
-      expect(() => mapper.on("construct", {})).toThrowError();
-      expect(() => mapper.on("construct", true)).toThrowError();
+      expect(() => mapper.on("creating", 11)).toThrowError();
+      expect(() => mapper.on("creating", {})).toThrowError();
+      expect(() => mapper.on("creating", true)).toThrowError();
     });
     it("should throw error when pass not allowed third arg", () => {
       const mapper = createHooksMapper();
-      expect(() => mapper.on("construct", function() {}, 11111)).toThrowError();
-      expect(() => mapper.on("construct", function() {}, {})).toThrowError();
-      expect(() => mapper.on("construct", function() {}, true)).toThrowError();
+      expect(() => mapper.on("creating", function() {}, 11111)).toThrowError();
+      expect(() => mapper.on("creating", function() {}, {})).toThrowError();
+      expect(() => mapper.on("creating", function() {}, true)).toThrowError();
     });
   });
   describe("fire method", () => {
@@ -110,7 +110,7 @@ describe("returned mapper from createHooksMapper", () => {
     const args = [1, 2];
     const systemArgs = [3, 4];
     const target = {};
-    const hook = "construct";
+    const hook = "creating";
 
     const mixinListenerSpy = jest.fn(function() {
       calledOrder.push(2);
@@ -196,7 +196,7 @@ describe("returned mapper from createHooksMapper", () => {
     const args = [1, 2];
     const systemArgs = [3, 4];
     const target = {};
-    const hook = "construct";
+    const hook = "creating";
 
     const mixinListenerSpy = jest.fn(function() {
       calledOrder.push(3);
@@ -288,7 +288,7 @@ describe("returned mapper from createHooksMapper", () => {
       const args = [1, 2];
       const systemArgs = [3, 4];
       const target = {};
-      const hook = "construct";
+      const hook = "creating";
 
       const mixinListenerSpy = jest.fn(function() {
         calledOrder.push(2);
@@ -329,7 +329,7 @@ describe("returned mapper from createHooksMapper", () => {
     describe("check chain responsability", () => {
       it("should not call mixin and system callables when model return false and result must be false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const modelListenerSpy = jest.fn().mockReturnValue(false);
         const mixinListenerSpy = jest.fn().mockReturnValue(false);
@@ -348,7 +348,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should not call system callable when mixin return false and result must be false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const modelListenerSpy = jest.fn().mockReturnValue(true);
         const mixinListenerSpy = jest.fn().mockReturnValue(false);
@@ -367,7 +367,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should give result false when system callabe return false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const modelListenerSpy = jest.fn().mockReturnValue(true);
         const mixinListenerSpy = jest.fn().mockReturnValue(true);
@@ -386,7 +386,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should give result true when all callabes return true", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const modelListenerSpy = jest.fn().mockReturnValue(true);
         const mixinListenerSpy = jest.fn().mockReturnValue(true);
@@ -459,7 +459,7 @@ describe("returned mapper from createHooksMapper", () => {
       const args = [1, 2];
       const systemArgs = [3, 4];
       const target = {};
-      const hook = "construct";
+      const hook = "creating";
 
       const mixinListenerSpy = jest.fn(function() {
         calledOrder.push(3);
@@ -500,7 +500,7 @@ describe("returned mapper from createHooksMapper", () => {
     describe("check chain responsability", () => {
       it("should not call mixin and model callables when system return false and result must be false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const systemListenerSpy = jest.fn().mockReturnValue(false);
         const modelListenerSpy = jest.fn().mockReturnValue(false);
@@ -519,7 +519,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should not call mixin callable when model return false and result must be false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const systemListenerSpy = jest.fn().mockReturnValue(true);
         const modelListenerSpy = jest.fn().mockReturnValue(false);
@@ -538,7 +538,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should give result false when mixin callabe return false", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const systemListenerSpy = jest.fn().mockReturnValue(true);
         const modelListenerSpy = jest.fn().mockReturnValue(true);
@@ -557,7 +557,7 @@ describe("returned mapper from createHooksMapper", () => {
       });
       it("should give result true when all callabes return true", () => {
         const mapper = createHooksMapper();
-        const hook = "construct";
+        const hook = "creating";
 
         const systemListenerSpy = jest.fn().mockReturnValue(true);
         const modelListenerSpy = jest.fn().mockReturnValue(true);

@@ -75,20 +75,20 @@ describe("Model", () => {
   });
 
   describe("Lifecycle", () => {
-    const construct = jest.fn();
+    const creating = jest.fn();
     const Hero = Model({
       ...schema,
-      construct
+      creating
     });
 
-    it("should call construct lifecycle", () => {
+    it("should call creating lifecycle", () => {
       const data = {
         name: "Andrei",
         age: 12
       };
       new Hero(data);
 
-      expect(construct).toBeCalledWith(data);
+      expect(creating).toBeCalledWith(data);
     });
 
     describe("Model Proxy", () => {
